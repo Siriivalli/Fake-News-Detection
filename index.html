@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin: 20px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Fake News Detection</h1>
+    <textarea id="newsText" placeholder="Enter news article here..."></textarea><br>
+    <button onclick="checkNews()">Check News</button>
+    <div id="result"></div>
+
+    <script>
+        function checkNews() {
+            const newsText = document.getElementById("newsText").value;
+            const resultDiv = document.getElementById("result");
+
+            if (!newsText.trim()) {
+                resultDiv.innerHTML = "❌ Please enter a news article.";
+                resultDiv.style.color = "red";
+                return;
+            }
+
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: newsText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.innerHTML = `📰 Prediction: <strong>${data.prediction}</strong>`;
+                resultDiv.style.color = data.prediction === "Fake News" ? "red" : "green";
+            })
+            .catch(error => {
+                resultDiv.innerHTML = "⚠️ Error checking news!";
+                resultDiv.style.color = "red";
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
+</body>
+</html>
